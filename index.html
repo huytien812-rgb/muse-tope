@@ -3,16 +3,74 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TopE</title>
+<title>TopE — Upload to TikTok</title>
 <style>
-body { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 48px auto; padding: 0 20px; color: #222; line-height: 1.6; }
-h1 { font-size: 2em; }
+body { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #222; line-height: 1.6; }
+h1 { font-size: 1.8em; margin-bottom: 0; }
+.sub { color: #555; margin-top: 4px; }
+.card { border: 1px solid #ddd; border-radius: 12px; padding: 16px 20px; margin: 20px 0; }
+label { display: block; margin: 10px 0 4px; font-weight: 600; }
+input[type="text"], input[type="number"], select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+input[type="file"] { margin: 8px 0; }
+button { padding: 10px 18px; border: 0; border-radius: 8px; background: #111; color: #fff; font-size: 1em; cursor: pointer; margin-right: 8px; }
+button.secondary { background: #eee; color: #222; }
+button:disabled { opacity: 0.5; cursor: default; }
+#log { white-space: pre-wrap; background: #f6f6f6; border-radius: 8px; padding: 12px; font-size: 0.9em; min-height: 60px; }
+.warn { background: #fff4d6; border: 1px solid #e6c200; border-radius: 8px; padding: 10px 14px; }
 a { color: #0b57d0; }
+small { color: #666; }
 </style>
 </head>
 <body>
 <h1>TopE</h1>
-<p>TopE is a tool that helps you upload videos to your own TikTok account through TikTok's official API.</p>
+<p class="sub">Upload videos to your own TikTok account through TikTok's official API.</p>
+
+<div id="configWarn" class="card warn" style="display:none"></div>
+
+<div class="card">
+<h2 style="margin-top:0">1. Connect your TikTok account</h2>
+<div id="loginBox">
+<button id="loginBtn">Log in with TikTok</button>
+<small>Scopes: user.info.basic, video.upload, video.publish</small>
+</div>
+<div id="accountBox" style="display:none">
+<p id="accountInfo"></p>
+<button id="logoutBtn" class="secondary">Log out</button>
+<button id="refreshBtn" class="secondary">Refresh token</button>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">2. Upload a video</h2>
+<label for="file">Video file (MP4, WebM or MOV)</label>
+<input type="file" id="file" accept="video/mp4,video/quicktime,video/webm">
+<label for="title">Title (required)</label>
+<input type="text" id="title" maxlength="150" placeholder="Video title">
+<label for="privacy">Who can watch</label>
+<select id="privacy">
+<option value="SELF_ONLY" selected>Only me (safest for testing)</option>
+<option value="PUBLIC_TO_EVERYONE">Public</option>
+<option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
+<option value="FOLLOWER_OF_CREATOR">Followers</option>
+</select>
+<label><input type="checkbox" id="noDuet"> Disable duet</label>
+<label><input type="checkbox" id="noComment"> Disable comments</label>
+<label><input type="checkbox" id="noStitch"> Disable stitch</label>
+<p>
+<button id="draftBtn">Upload as draft</button>
+<button id="publishBtn">Publish directly</button>
+</p>
+<small>Draft = video goes to your TikTok inbox for you to finish in the app (needs video.upload).
+Direct publish = video goes straight to your profile (needs video.publish).
+Unaudited apps post as private-only until TikTok approves the app.</small>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">Status</h2>
+<div id="log">Ready.</div>
+</div>
+
 <p><a href="terms.html">Terms of Service</a> &middot; <a href="privacy.html">Privacy Policy</a></p>
+<script src="app.js"></script>
 </body>
 </html>

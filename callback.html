@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TopE — Connecting…</title>
+<style>body { font-family: system-ui, sans-serif; max-width: 640px; margin: 48px auto; padding: 0 20px; }</style>
+</head>
+<body>
+<h1>Connecting to TikTok…</h1>
+<p id="msg">Exchanging the authorization code…</p>
+<script>
+(async () => {
+  // API_BASE must match the value in app.js.
+  const API_BASE = 'https://PASTE_WORKER_URL_HERE';
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  const state = params.get('state');
+  const err = params.get('error');
+  const msg = document.getElementById('msg');
+  if (err) { msg.textContent = 'TikTok refused authorization: ' + err; return; }
+  if (!code) { msg.textContent = 'No authorization code received.'; return; }
+  if (state !== sessionStorage.getItem('tope_state')) { msg.textContent = 'State mismatch. Please try logging in again.'; return; }
+  const dir = location.pathname.replace(/\/[^\/]*$/, '/');
+  const redirectUri = location.origin + dir + 'callback.html';
+  try {
+    const res = await fetch(API_BASE + '/api/auth/callback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, redirect_uri: redirectUri }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || data.error || ('HTTP ' + res.status));
+    data.saved_at = Date.now();
+    localStorage.setItem('tope_tokens', JSON.stringify(data));
+    location.href = dir + 'index.html?login=ok';
+  } catch (e) {
+    msg.textContent = 'Login failed: ' + e.message;
+  }
+})();
+</script>
+</body>
+</html>
